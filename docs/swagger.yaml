@@ -1,0 +1,292 @@
+openapi: 3.0.1
+info:
+  title: Booking API
+  version: 0.1.0
+  description: API Documentation
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /bookings:
+    get:
+      summary: Returns all bookings
+      tags: 
+        - Bookings
+      parameters:
+        - $ref: "#/components/parameters/pageParams"
+        - $ref: "#/components/parameters/limitParams"
+      responses:
+        200:
+          description:  A JSON array of bookings
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/BookingAll"
+        500:
+          $ref: "#/components/responses/ServerError"    
+    post:
+      summary: Create new booking
+      security:
+        - bearerAuth: []
+      tags:
+        - Bookings
+      requestBody:
+        $ref: "#/components/requestBodies/CreateBooking"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        401:
+          description: Unauthorized
+
+  /bookings/{id}:
+    get:
+      summary: Returns booking by ID
+      tags: 
+        - Bookings
+      parameters:
+        - $ref: "#/components/parameters/bookingIdParams"
+      responses:
+        200:
+          description: A JSON booking object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+    delete:
+      summary: Delete booking by ID
+      security:
+        - bearerAuth: []
+      tags: 
+        - Bookings
+      parameters:
+        - $ref: "#/components/parameters/bookingIdParams"
+      responses:
+        204:
+          description: Deleted
+  
+  /login:
+    post:
+      summary: Login
+      tags:
+        - Auth
+      requestBody:
+        $ref: "#/components/requestBodies/Login"
+      responses:
+        200:
+          description: Access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        500:
+          $ref: "#/components/responses/ServerError"
+  /register:
+    post:
+      summary: Register
+      tags:
+        - Auth
+      requestBody:
+        $ref: "#/components/requestBodies/Register"
+      responses:
+        201:
+          description: User information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+components:
+  parameters:
+    bookingIdParams:
+      name: id
+      in: path
+      description: Booking ID 
+      schema:
+        type: string
+      required: true
+    pageParams:
+      name: page
+      in: query
+      description: Page number.
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    limitParams:
+      name: limit
+      in: query
+      description: Maximum number of items to return.
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+  
+  schemas:
+    Booking:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: The Id of the booking
+          example: "67522446d3bdfd85696e4735"
+        user:
+          type: string
+          description: The name of the user
+          example: "spasibo"
+        date:
+          type: string
+          format: date
+          description: The date in the format YYYY-MM-DD
+          example: "2024-12-05"
+        startTime:
+          type: string
+          pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          description: The start time in the format HH:mm
+          example: "08:30"
+        endTime:
+          type: string
+          pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          description: The end time in the format HH:mm
+          example: "12:30"
+    BookingAll:
+      type: object
+      properties:
+        limit:
+          type: number
+          example: 10
+        page:
+          type: number
+          example: 1
+        skip:
+          type: number
+          example: 0
+        pageCount:
+          type: number
+          example: 1
+        totalCount:
+          type: number
+          example: 1
+        data:
+          type: array
+          example: [{ _id: "67503653edfc06d5890c8f45", user: "spasibo", date: "2024-12-05", startTime: "08:30", endTime: "12:30" }]
+    BookingCreate:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: The date in the format YYYY-MM-DD
+          example: "2024-12-05"
+        startTime:
+          type: string
+          pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          description: The start time in the format HH:mm
+          example: "08:30"
+        endTime:
+          type: string
+          pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          description: The end time in the format HH:mm
+          example: "12:30"
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Something went wrong"
+    NotFound:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Resource not found"
+    LoginParams:
+      type: object
+      properties:
+        login:
+          type: string
+          example: "spasibo"
+        password:
+          type: stryng
+          example: "Qwerty123"
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: "access_token"
+    RegisterParams:
+      type: object
+      properties:
+        login:
+          type: string
+          example: "spasibo"
+        password:
+          type: string
+          example: "Qwerty123"
+        email:
+          type: string
+          example: "admin@spasibo.ra"
+    RegisterResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "674f01a6c73f61c12058f407"
+        role:
+          type: string
+          example: "admin"
+
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  requestBodies:
+    Login:
+      description: Auth credential
+      require: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LoginParams"
+    Register:
+      description: Auth credential
+      require: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RegisterParams"
+    CreateBooking:
+      description: Booking information
+      require: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BookingCreate"
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotFound"
+    ServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

@@ -1,0 +1,38 @@
+{
+  "name": "keym-test-task",
+  "version": "0.1.0",
+  "description": "Simple backend service for managing a booking system (test task)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_ENV=test mocha",
+    "lint": "eslint \"**/*.mjs\" --quiet --fix",
+    "start": "NODE_ENV=production node server.js",
+    "start:dev": "npx nodemon"
+  },
+  "author": "spasibo-ra",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.3",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "chai": "^5.1.2",
+    "chai-http": "^5.1.1",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0",
+    "mocha": "^11.0.1",
+    "nodemon": "^3.1.7",
+    "superagent": "^10.1.1"
+  }
+}
